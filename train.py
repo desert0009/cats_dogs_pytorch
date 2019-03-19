@@ -158,6 +158,7 @@ def predict_dog_prob_of_single_instance(model, tensor):
     return preds[0,1].item()
 
 def save_results(model, test_path, save_path):
+    print('save_results start')
     was_training = model.training
     model.eval()
     
@@ -168,7 +169,7 @@ def save_results(model, test_path, save_path):
             im = Image.open(os.path.join(test_path, inputs))
             im_as_tensor = apply_test_transforms(im)
             pred = predict_dog_prob_of_single_instance(model, im_as_tensor)
-            results[key] = pred
+            results[key] = 1 if pred >=0.5 else 0
             
         model.train(mode=was_training)
 
@@ -179,7 +180,7 @@ def save_results(model, test_path, save_path):
     df = df[['id', 'label']]
     df.head()
     df.to_csv(save_path, index=False)
-    
+    print('save_results done')
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     imshow(sample_train_images, title=[class_names[x] for x in classes])
     
     # Load a pretrained model and reset final fully connected layer.
-    model_conv = torchvision.models.resnet50(pretrained=True)
+    model_conv = torchvision.models.resnet18(pretrained=True)
     
     # If you want to try updating all parameters
     # you can set param.requires_grad = True
